@@ -1,46 +1,47 @@
 import { ApolloServer, gql } from "apollo-server";
-
-const authors = [{ id: 1, name: "Nakanishi" }, { id: 2, name: "Sasaki" }];
-
-const books = [
-  {
-    title: "Harry Potter and the Chamber of Secrets",
-    author: "J.K. Rowling"
-  },
-  {
-    title: "Jurassic Park",
-    author: "Michael Crichton"
-  }
-];
+import { Resolvers } from "src/types/graphql";
+import RestaurantAPI from "./resAPI";
 
 const typeDefs = gql`
-  type Author {
-    name: String
-    id: Int!
-    blar: Boolean!
-  }
-
   type Query {
-    getAuthor(id: Int!): [Author]!
+    getAuthor(id: String!): Author
+  }
+  type Author {
+    name: String!
+    id: ID!
+    books: [Book!]!
+  }
+  type Book {
+    title: String!
   }
 `;
 
-const resolvers = {
+const resolvers: Resolvers = {
   Query: {
-    getAuthor: () => authors
+    getAuthor: (parent, args, context) => {
+      const authors = context.authors;
+      return authors.find(author => author.id === args.id);
+    }
   },
   Author: {
-    name: (_, __, ___) => "my name",
-    id: () => 2,
-    blar: (author, _, __) => {
-      return true;
+    books: (_parent, _args, _context) => {
+      return [{ title: `book title id#${_parent.id}` }];
     }
-  }
+  },
+  Book: {}
 };
+
+const authors = [{ id: "1", name: "nakanishi" }, { id: "2", name: "satou" }];
 
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  context: () => ({
+    authors
+  }),
+  dataSources: () => ({
+    restaurantAPI: new RestaurantAPI()
+  })
 });
 
 server.listen().then(({ url }) => {

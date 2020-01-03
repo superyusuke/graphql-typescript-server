@@ -1,0 +1,12 @@
+schema: "./src/index.ts"
+overwrite: true
+generates:
+  ./src/types/graphql.d.ts:
+    config:
+      useIndexSignature: true
+      contextType: ./context#Context
+      mappers:
+        Author: ./parent#AuthorParent
+    plugins:
+      - typescript
+      - typescript-resolvers
