@@ -1,3 +1,5 @@
+import { DataSources } from "src/dataSources";
+
 type Author = {
   name: string;
   id: string;
@@ -5,5 +7,5 @@ type Author = {
 
 export type Context = {
   authors: Author[];
-  moviesAPI: any;
+  dataSources: DataSources;
 };

@@ -1,6 +1,6 @@
 import { ApolloServer, gql } from "apollo-server";
 import { Resolvers } from "src/types/graphql";
-import RestaurantAPI from "./resAPI";
+import { dataSources } from "src/dataSources";
 
 const typeDefs = gql`
   type Query {
@@ -28,7 +28,14 @@ const resolvers: Resolvers = {
       return [{ title: `book title id#${_parent.id}` }];
     }
   },
-  Book: {}
+  Book: {
+    title: (_parent, _args, _context) => {
+      const { dataSources } = _context;
+      console.log(dataSources);
+      // console.log(dataSources.restaurantApi);
+      return dataSources.restaurantAPI.getHoge();
+    }
+  }
 };
 
 const authors = [{ id: "1", name: "nakanishi" }, { id: "2", name: "satou" }];
@@ -40,7 +47,7 @@ const server = new ApolloServer({
     authors
   }),
   dataSources: () => ({
-    restaurantAPI: new RestaurantAPI()
+    restaurantAPI: dataSources.restaurantAPI
   })
 });
 
